@@ -1,0 +1,36 @@
+Background:
+'Every year the Center for Disease Control and Prevention (CDC) releases the country's most detailed report on death in the United States under the National Vital Statistics Systems. This mortality dataset is a record of every death in the country for the year 2014, which includes detailed information about causes of death and the demographic background of the deceased.'
+
+I took the US death dataset from 2014 from the CDC and developed a predictive model on the "manner of death", which are seven categories of death: Accident, Could not determine, Homocide, Natural,Pending Investigation, Self-Inflicted, and Suicide. Out of all of the possible predictors, only three stood out as important for predicting "manner of death", which were Education Level, Marital Status, and Race. Other possible outcomes where tried including Age of death, Cause of death, day of the week, month of the year. But none of these could be modeled with predictions over 20% accuracy. There was simply little or no relationship between the predictors and these outcomes.
+
+Data: http://www.cdc.gov/nchs/deaths.htm
+
+Issues:
+Unfortunately, my computer's processing power could only handle ~20% of the full data. So I was only able to train my model on 15% of the total data, with 5% reserved for confidence testing. Given only factor data, my model selection was limited. I tried Classification and Regression Tree (CART), Linear Discriminant Analysis (LDA) and Random Forests (RF), but CART had about the same accuracy as LDA, but no diversity in outcome prediction, and my computer couldn't handle training an RF model on even 5% of the total data. The CART model has a 77.5% accuracy, while the LDA had about the same, and the one RF I could finish had a 78% accuracy. I settled on the LDA model for practicality.
+
+The data for "manner of death" is heavily skewed toward "Self-Inflicted" with ~78% of total cases. "Natural" deaths come in second at ~14%. So, the 77% accuracy of the model is unsurprising: even guessing "Self-Inflicted" every time will yield ~78% accuracy anyway. 
+
+Manner of Death---------------------------% of total
+
+Self-Inflicted---------------------------------78.29
+Natural----------------------------------------13.84
+Accident----------------------------------------5.04
+Suicide-----------------------------------------1.64
+Homocide----------------------------------------0.64
+Could not determine-----------------------------0.41
+Pending Investigation---------------------------0.14
+
+With that said, given all possible permutations of inputs, the model can predict for all possible outcomes.
+
+
+References: 
+
+http://www.cdc.gov/nchs/data/dvs/red_form.pdf
+https://www.kaggle.com/cdc/mortality
+http://www.cdc.gov/nchs/deaths.htm
+
+
+
+
+
+
