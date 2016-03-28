@@ -1,0 +1,105 @@
+<style>
+.reveal p{
+   font-size: 40px;
+}
+.reveal pre{
+  font-size: 12px;
+}
+.reveal small{
+  font-size: 25px;
+}
+.reveal a{
+  font-size: 35px;
+}
+.reveal EA{
+   font-size: 30px;
+}
+</style>
+
+Coursera Data Product Project
+========================================================
+author: Shaddyjr
+date: 3/27/16
+transition: concave
+***
+```{r Title, echo=FALSE}
+require(ggplot2)
+load("rawdata/MidData")
+
+#Marital Status deaths
+e<-as.factor(as.character(myData1$MannerofDeath[myData1$MannerofDeath %in% levels(myData1$MannerofDeath)[c(1,4,6)]]))
+x<-table(myData1$MaritalStatus[myData1$MannerofDeath %in% levels(myData1$MannerofDeath)[c(1,4,6)]], e)
+y<-apply(x, 1, sum)
+z<-x/y #getting percentage of total deaths by education level
+Mardeath<-data.frame(z)
+#-log distorts data
+w<-ggplot(data = Mardeath,aes(x=Var1, y=Freq))
+w<-w+geom_bar(stat = "identity", aes(fill=Var1))+facet_wrap(~e)+theme(axis.text.x=element_blank())
+w<-w+xlab("Education level")
+print(w)
+```
+Predicting Manner of Death
+
+The Data
+========================================================
+Every year the Center for Disease Control and Prevention (CDC) releases the country's most detailed report on death in the United States under the National Vital Statistics Systems. This [mortality dataset](http://www.cdc.gov/nchs/deaths.htm) is a record of every death in the country for the year 2014, which includes detailed information about causes of death and the demographic background of the deceased.
+```{r Data, echo=FALSE}
+library(caret)
+load("rawdata/Table1")
+
+y
+```
+
+Exploratory Analysis
+========================================================
+class: EA
+```{r Graphs, echo=FALSE, cache=TRUE}
+
+e<-as.factor(as.character(myData1$MannerofDeath[myData1$MannerofDeath %in% levels(myData1$MannerofDeath)[c(1,4,6)]]))
+x<-table(myData1$EducationReportFlag[myData1$MannerofDeath %in% levels(myData1$MannerofDeath)[c(1,4,6)]], e)
+y<-apply(x, 1, sum)
+z<-x/y #getting percentage of total deaths by education level
+edudeath<-data.frame(z)
+#-log distorts data
+w<-ggplot(data = edudeath,aes(x=Var1, y=Freq))
+w<-w+geom_bar(stat = "identity", aes(fill=Var1))+facet_wrap(~e)+theme(axis.text.x=element_blank())
+w<-w+xlab("Education level")
+print(w)
+```
+***
+<EA>The Data show a number of interesting trends, such as the dependence of "Manner of Death" on Education level.</EA>
+
+<EA>Although there was a lot of data, it was difficult to fit predictive models to outcomes such as Age of Death and Main Cause of Death.</EA>
+
+<EA>However, the outcome of "Manner of Death" did show some promise, which is what I went with for this project.</EA>
+
+
+Forming a Predictive Model
+========================================================
+The best model (most accurate) was an LDA trained to predict Manner of Death on 4 predictors: Education Level, Marital Status, Race, and Sex.
+
+<small>The LDA Model</small>
+```{r, Model, echo=FALSE}
+load("rawdata/Fmod")
+testing<-read.csv("rawdata/testing.csv", stringsAsFactors = TRUE, check.names = FALSE)
+
+confusionMatrix(testing$MannerofDeath, predict(ldaModS, testing))$overall[1] #77%
+
+confusionMatrix(testing$MannerofDeath, predict(ldaModS, testing))$byClass[,c(1,2,8)]
+```
+
+Final Thoughts, Links and References
+========================================================
+class: small
+<small>       The data for "manner of death" is heavily skewed toward "Self-Inflicted" with ~78% of total cases. "Natural" deaths come in second at ~14%. So, the 77% accuracy of the model is unsurprising: even guessing "Self-Inflicted" every time would yield ~78% accuracy. </small>
+
+<small>       With that said, given all possible permutations of inputs, the LDA model does predict for all possible outcomes.</small>
+
+- [Shinyapp Link](https://shaddyjr.shinyapps.io/DeathApp/)
+- [Github for project](https://github.com/Shaddyjr/Data-Product-App-Project)
+
+References:
+- http://www.cdc.gov/nchs/data/dvs/red_form.pdf
+- https://www.kaggle.com/cdc/mortality
+- http://www.cdc.gov/nchs/deaths.htm
+
